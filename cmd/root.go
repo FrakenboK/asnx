@@ -1,0 +1,30 @@
+/*
+Copyright © 2025 NAME HERE FrakenboK@cR4.sh
+*/
+package cmd
+
+import (
+	"github.com/FrakenboK/asnx/internal/options"
+	"github.com/FrakenboK/asnx/internal/runner"
+
+	"github.com/spf13/cobra"
+)
+
+func NewRootCmd() *cobra.Command {
+	opts := &options.Options{}
+	runner := runner.New(opts)
+
+	var cmd = &cobra.Command{
+		Use:   "asnx",
+		Short: "A tool for obtaining information about ASN hosts using RDAP",
+		Run:   runner.Start,
+	}
+
+	// Search by IP
+	cmd.Flags().StringArrayVarP(&opts.IPs, "ips", "i", []string{}, "IP addresses (usage: -i 127.0.0.1,8.8.8.8 or --ips ips.txt)")
+	cmd.Flags().BoolVar(&opts.FullNetworkEnum, "enum", false, "Enumerates information about all hosts in resolved ASNs")
+
+	cmd.Flags().BoolVarP(&opts.Version, "version", "v", false, "Shows asnx version")
+
+	return cmd
+}

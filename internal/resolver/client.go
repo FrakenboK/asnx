@@ -41,11 +41,39 @@ func (r *Resolver) HandleIPs(ips []string, enum bool) {
 		response := r.processIPResponse(ip, info)
 
 		if !enum {
-			r.log.Info(r.fmtResponse(response))
+			r.log.Info(r.fmtResponse(response, enum))
 			continue
 		}
+		asnAddrs, err := getIPRange(response.StartAddress, response.EndAddress)
+		if err != nil {
+			r.log.Fail(
+				fmt.Sprintf("Failed to extract IP-range: %s - %s; %s", response.StartAddress, response.EndAddress, err.Error()),
+			)
+		}
 
-		// TODO: enum
+		r.log.Note(
+			fmt.Sprintf(
+				"ASN IP-range for entered IP address [%s]: %s - %s",
+				color.YellowString(ip),
+				response.StartAddress,
+				response.EndAddress,
+			),
+		)
+
+		for _, asnAddr := range asnAddrs {
+			asd, err := r.client.QueryIP(asnAddr)
+			if err != nil {
+				r.log.Fail(
+					fmt.Sprintf("Failed to handle IP info: %s, [%s]", asnAddr, err.Error()),
+				)
+				continue
+			}
+
+			resp := r.processIPResponse(asnAddr, asd)
+			r.log.Info(r.fmtResponse(resp, enum))
+		}
+		fmt.Println()
+
 	}
 }
 
@@ -75,7 +103,7 @@ func (r *Resolver) processRDAPEntities(entities []rdap.Entity) *Response {
 	return &Response{}
 }
 
-func (r *Resolver) fmtResponse(resp *Response) string {
+func (r *Resolver) fmtResponse(resp *Response, enum bool) string {
 	var printable string
 	if resp.IP != "" {
 		printable = fmt.Sprintf("IP: %24s =>", color.YellowString(resp.IP))
@@ -102,7 +130,9 @@ func (r *Resolver) fmtResponse(resp *Response) string {
 		printable = fmt.Sprintf("%s Address=\"%s\"", printable, resp.Address)
 	}
 
-	printable = fmt.Sprintf("%s IP_range=\"%s - %s\"", printable, resp.StartAddress, resp.EndAddress)
+	if !enum {
+		printable = fmt.Sprintf("%s IP_range=\"%s - %s\"", printable, resp.StartAddress, resp.EndAddress)
+	}
 
 	return printable
 }

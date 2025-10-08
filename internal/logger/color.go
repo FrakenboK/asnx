@@ -8,6 +8,7 @@ import (
 )
 
 var (
+	noteString    = color.RGB(138, 43, 226).Sprintf("[***]")
 	failString    = color.RedString("[-]")
 	infoString    = color.GreenString("[+]")
 	versionString = fmt.Sprintf("\n\t\tYou are using asnx version %s!\n", color.MagentaString(version.Version))

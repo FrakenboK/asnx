@@ -14,6 +14,10 @@ func (l *Logger) Info(msg string) {
 	fmt.Println(infoString, msg)
 }
 
+func (l *Logger) Note(msg string) {
+	fmt.Println(noteString, msg)
+}
+
 func (l *Logger) Version() {
 	fmt.Println(versionString)
 }

@@ -18,24 +18,20 @@ type Runner struct {
 }
 
 func (r *Runner) Start(cmd *cobra.Command, args []string) {
-	if !r.opts.BannerDisabled {
-		r.log.RawLog(ui.GetBanner())
-	}
-
-	if r.opts.Version {
+	if r.opts.Version || len(r.opts.IPs) == 0 { // TODO: all options
 		cmd.Help()
 		return
 	}
 
-	r.log.Note("Searching for ASNs...")
-
-	if len(r.opts.IPs) > 0 {
-		ext := extractor.New(r.log, "IP", validator.IpRegex)
-		ips := ext.ExtractValues(r.opts.IPs)
-		r.rdap.HandleIPs(ips, r.opts.IPRangeFile)
-		return
+	if !r.opts.BannerDisabled {
+		r.log.RawLog(ui.GetBanner())
 	}
-	cmd.Help()
+
+	// TODO: all options
+	r.log.Note("Searching for ASNs...")
+	ext := extractor.New(r.log, "IP", validator.IpRegex)
+	ips := ext.ExtractValues(r.opts.IPs)
+	r.rdap.HandleIPs(ips, r.opts.IPRangeFile)
 }
 
 func New(opts *options.Options) *Runner {

@@ -13,8 +13,8 @@
 
 # Installation
 
-```
-Sorry, but now: go build :)
+```bash
+go install github.com/FrakenboK/asnx@latest
 ```
 
 # Usage

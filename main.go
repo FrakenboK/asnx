@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 NAME HERE FrakenboK@cR4.sh
+Copyright © 2025 Kobyak Mikhail FrakenboK@cR4.sh
 */
 package main
 

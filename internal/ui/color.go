@@ -2,17 +2,18 @@ package ui
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
 
 	"github.com/FrakenboK/asnx/internal/version"
 	"github.com/fatih/color"
 )
 
 var (
-	// r = rand.New(rand.NewSource(time.Now().UnixNano()))
-	// randomColor = color.RGB(r.Intn(255), r.Intn(255), r.Intn(255))
+	r           = rand.New(rand.NewSource(time.Now().UnixNano()))
+	randomColor = color.RGB(r.Intn(255), r.Intn(255), r.Intn(255))
 
-	// 209, 59, 107
-	randomColor = color.RGB(177, 70, 102)
+	// randomColor = color.RGB(177, 70, 102) // For README.md banner
 
 	FailPrefix  = color.RedString("[-]")
 	InfoPrefix  = color.GreenString("[+]")

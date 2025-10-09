@@ -17,8 +17,6 @@ type Runner struct {
 }
 
 func (r *Runner) Start(cmd *cobra.Command, args []string) {
-	r.log.Banner()
-
 	if r.opts.Version {
 		cmd.Help()
 		return

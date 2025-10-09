@@ -47,7 +47,7 @@ func (r *Resolver) HandleIPs(ips []string, ipRangeFilename string) {
 			continue
 		}
 		response := r.processIPResponse(ip, info)
-		r.log.Info(r.printFmtResponse(response))
+		r.log.Info(r.fmtResponse(response))
 
 		responseAsnAddrs, err := getIPRange(response.StartAddress, response.EndAddress)
 		if err != nil {
@@ -113,21 +113,21 @@ func (r *Resolver) processRDAPEntities(entities []rdap.Entity) SpecialInfo {
 	return SpecialInfo{}
 }
 
-func (r *Resolver) printFmtResponse(resp *Response) string {
+func (r *Resolver) fmtResponse(resp *Response) string {
 	var printable string
 	if resp.IP != "" {
-		fmt.Printf("IP: %24s => ", color.YellowString(resp.IP))
+		printable = fmt.Sprintf("IP: %24s => ", color.YellowString(resp.IP))
 	} else {
-		fmt.Printf("Domain: %24s => ", color.YellowString(resp.Domain))
+		printable = fmt.Sprintf("Domain: %24s => ", color.YellowString(resp.Domain))
 	}
 
-	printable = fmt.Sprintf("%s %s", printable, fmtInfo(resp.Info))
+	printable = fmt.Sprintf("%s %s", printable, fmtSpecialInfo(resp.Info))
 	printable = fmt.Sprintf("%s IP_range=\"%s - %s\"", printable, resp.StartAddress, resp.EndAddress)
 
 	return printable
 }
 
-func fmtInfo(info SpecialInfo) string {
+func fmtSpecialInfo(info SpecialInfo) string {
 	printable := ""
 	reflectionValue := reflect.ValueOf(info)
 

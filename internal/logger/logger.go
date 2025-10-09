@@ -19,11 +19,6 @@ func (l *Logger) Info(msg string) {
 	fmt.Println(ui.InfoPrefix, msg)
 }
 
-func (l *Logger) Banner() {
-	ui.RandomColor.Println(ui.Banner)
-	fmt.Println(ui.VersionDesc)
-}
-
 func (l *Logger) Note(msg string) {
 	totalWidth := 70
 	msgWidth := len(msg)
@@ -47,5 +42,9 @@ func (l *Logger) Note(msg string) {
 }
 
 func New() *Logger {
+
+	ui.RandomColor.Println(ui.Banner)
+	fmt.Println(ui.VersionDesc)
+
 	return &Logger{}
 }

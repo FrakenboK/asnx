@@ -1,7 +1,9 @@
 package options
 
 type Options struct {
-	IPs         []string
+	IPs     []string
+	Domains []string
+
 	IPRangeFile string
 	Version     bool
 }

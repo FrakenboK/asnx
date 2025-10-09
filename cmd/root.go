@@ -25,6 +25,9 @@ func NewRootCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&opts.IPRangeFile, "ip-range-file", "f", "", "File to save all ip ranges handeled from ASN")
 	// TODO: -o
 
+	// Search by Domain
+	cmd.Flags().StringArrayVarP(&opts.Domains, "domains", "d", []string{}, "Domain names (usage: -i cr4.sh,yandex.ru or --domains domains.txt)")
+
 	cmd.Flags().BoolVarP(&opts.Version, "version", "v", false, "Shows asnx version")
 
 	return cmd

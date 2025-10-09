@@ -1,9 +1,9 @@
 package options
 
 type Options struct {
-	IPs             []string
-	FullNetworkEnum bool
-	Version         bool
+	IPs         []string
+	IPRangeFile string
+	Version     bool
 }
 
 func New() *Options {

@@ -17,16 +17,19 @@ type Runner struct {
 }
 
 func (r *Runner) Start(cmd *cobra.Command, args []string) {
+	r.log.Banner()
+
 	if r.opts.Version {
-		r.log.Version()
 		cmd.Help()
 		return
 	}
 
+	r.log.Note("Searching for ASNs...")
+
 	if len(r.opts.IPs) > 0 {
 		ext := extractor.New(r.log, "IP", validator.IpRegex)
 		ips := ext.ExtractValues(r.opts.IPs)
-		r.rdap.HandleIPs(ips, r.opts.FullNetworkEnum)
+		r.rdap.HandleIPs(ips, r.opts.IPRangeFile)
 		return
 	}
 	cmd.Help()

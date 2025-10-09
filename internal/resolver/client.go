@@ -2,6 +2,8 @@ package resolver
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/FrakenboK/asnx/internal/logger"
 	"github.com/fatih/color"
@@ -28,7 +30,9 @@ type Response struct {
 	Address string
 }
 
-func (r *Resolver) HandleIPs(ips []string, enum bool) {
+func (r *Resolver) HandleIPs(ips []string, ipRangeFilename string) {
+	asnIPs := []string{}
+
 	for _, ip := range ips {
 		info, err := r.client.QueryIP(ip)
 		if err != nil {
@@ -37,44 +41,38 @@ func (r *Resolver) HandleIPs(ips []string, enum bool) {
 			)
 			continue
 		}
-
 		response := r.processIPResponse(ip, info)
+		r.log.Info(r.fmtResponse(response))
 
-		if !enum {
-			r.log.Info(r.fmtResponse(response, enum))
-			continue
-		}
-		asnAddrs, err := getIPRange(response.StartAddress, response.EndAddress)
+		responseAsnAddrs, err := getIPRange(response.StartAddress, response.EndAddress)
 		if err != nil {
 			r.log.Fail(
-				fmt.Sprintf("Failed to extract IP-range: %s - %s; %s", response.StartAddress, response.EndAddress, err.Error()),
+				fmt.Sprintf("Failed to extract IP-range: %s - %s; %s",
+					response.StartAddress,
+					response.EndAddress,
+					err.Error(),
+				),
 			)
 		}
 
-		r.log.Note(
-			fmt.Sprintf(
-				"ASN IP-range for entered IP address [%s]: %s - %s",
-				color.YellowString(ip),
-				response.StartAddress,
-				response.EndAddress,
-			),
-		)
-
-		for _, asnAddr := range asnAddrs {
-			asd, err := r.client.QueryIP(asnAddr)
-			if err != nil {
-				r.log.Fail(
-					fmt.Sprintf("Failed to handle IP info: %s, [%s]", asnAddr, err.Error()),
-				)
-				continue
-			}
-
-			resp := r.processIPResponse(asnAddr, asd)
-			r.log.Info(r.fmtResponse(resp, enum))
-		}
-		fmt.Println()
-
+		asnIPs = append(asnIPs, responseAsnAddrs...)
 	}
+
+	if ipRangeFilename == "" {
+		return
+	}
+	r.log.Note(fmt.Sprintf("Saving IP ranges to file %s", ipRangeFilename))
+	r.saveIPRange(asnIPs, ipRangeFilename)
+}
+
+func (r *Resolver) saveIPRange(ipRange []string, filename string) error {
+	text := strings.Join(ipRange, "\n")
+
+	return os.WriteFile(
+		filename,
+		[]byte(text),
+		0644,
+	)
 }
 
 func (r *Resolver) processIPResponse(ip string, info *rdap.IPNetwork) *Response {
@@ -103,7 +101,7 @@ func (r *Resolver) processRDAPEntities(entities []rdap.Entity) *Response {
 	return &Response{}
 }
 
-func (r *Resolver) fmtResponse(resp *Response, enum bool) string {
+func (r *Resolver) fmtResponse(resp *Response) string {
 	var printable string
 	if resp.IP != "" {
 		printable = fmt.Sprintf("IP: %24s =>", color.YellowString(resp.IP))
@@ -130,9 +128,7 @@ func (r *Resolver) fmtResponse(resp *Response, enum bool) string {
 		printable = fmt.Sprintf("%s Address=\"%s\"", printable, resp.Address)
 	}
 
-	if !enum {
-		printable = fmt.Sprintf("%s IP_range=\"%s - %s\"", printable, resp.StartAddress, resp.EndAddress)
-	}
+	printable = fmt.Sprintf("%s IP_range=\"%s - %s\"", printable, resp.StartAddress, resp.EndAddress)
 
 	return printable
 }

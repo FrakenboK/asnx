@@ -2,14 +2,29 @@ package logger
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
 
 	"github.com/FrakenboK/asnx/internal/version"
 	"github.com/fatih/color"
 )
 
 var (
-	noteString    = color.RGB(138, 43, 226).Sprintf("[***]")
+	r = rand.New(rand.NewSource(time.Now().UnixNano()))
+	// 57 82 216
+	randomColor = color.RGB(r.Intn(255), r.Intn(255), r.Intn(255))
+
 	failString    = color.RedString("[-]")
 	infoString    = color.GreenString("[+]")
-	versionString = fmt.Sprintf("\n\t\tYou are using asnx version %s!\n", color.MagentaString(version.Version))
+	versionString = fmt.Sprintf("\t\t  You are using asnx version %s!\n", randomColor.Sprintf(version.Version))
+
+	banner = `								
+												
+		▄█████▄  ▄▄█████▄  ██▄████▄  ▀██  ██▀ 
+		▀ ▄▄▄██  ██▄▄▄▄ ▀  ██▀   ██    ████   
+		▄██▀▀▀██   ▀▀▀▀██▄  ██    ██    ▄██▄   
+		██▄▄▄███  █▄▄▄▄▄██  ██    ██   ▄█▀▀█▄  
+		▀▀▀▀ ▀▀   ▀▀▀▀▀▀   ▀▀    ▀▀  ▀▀▀  ▀▀▀ 
+											
+		`
 )

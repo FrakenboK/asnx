@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/FrakenboK/asnx/internal/logger"
+	"github.com/fatih/color"
 )
 
 type Extractor struct {
@@ -57,7 +58,7 @@ func (e *Extractor) ProcessValue(
 		return []string{value}
 	}
 
-	e.log.Fail(fmt.Sprintf("Invalid %s found %s", e.name, value))
+	e.log.Fail(fmt.Sprintf("Invalid %s found %s", e.name, color.RedString(value)))
 	return []string{}
 }
 

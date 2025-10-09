@@ -6,7 +6,7 @@ import (
 
 	"github.com/fatih/color"
 
-	"github.com/FrakenboK/asnx/internal/logger/ui"
+	"github.com/FrakenboK/asnx/internal/ui"
 )
 
 type Logger struct{}
@@ -17,6 +17,10 @@ func (l *Logger) Fail(msg string) {
 
 func (l *Logger) Info(msg string) {
 	fmt.Println(ui.InfoPrefix, msg)
+}
+
+func (l *Logger) RawLog(msg string) {
+	fmt.Println(msg)
 }
 
 func (l *Logger) Note(msg string) {
@@ -39,12 +43,4 @@ func (l *Logger) Note(msg string) {
 		color.GreenString(leftArrows),
 		msg,
 		color.GreenString(rightArrows))
-}
-
-func New() *Logger {
-
-	ui.RandomColor.Println(ui.Banner)
-	fmt.Println(ui.VersionDesc)
-
-	return &Logger{}
 }

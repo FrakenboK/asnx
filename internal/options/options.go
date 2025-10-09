@@ -5,9 +5,8 @@ type Options struct {
 	Domains []string
 
 	IPRangeFile string
-	Version     bool
-}
+	OutputFile  string
 
-func New() *Options {
-	return &Options{}
+	Version        bool
+	BannerDisabled bool
 }

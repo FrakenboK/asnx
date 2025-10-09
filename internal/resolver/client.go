@@ -116,9 +116,9 @@ func (r *Resolver) processRDAPEntities(entities []rdap.Entity) SpecialInfo {
 func (r *Resolver) fmtResponse(resp *Response) string {
 	var printable string
 	if resp.IP != "" {
-		printable = fmt.Sprintf("IP: %24s => ", color.YellowString(resp.IP))
+		printable = fmt.Sprintf("IP: %24s =>", color.YellowString(resp.IP))
 	} else {
-		printable = fmt.Sprintf("Domain: %24s => ", color.YellowString(resp.Domain))
+		printable = fmt.Sprintf("Domain: %24s =>", color.YellowString(resp.Domain))
 	}
 
 	printable = fmt.Sprintf("%s %s", printable, fmtSpecialInfo(resp.Info))

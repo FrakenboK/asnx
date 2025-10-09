@@ -6,6 +6,7 @@ import (
 	"github.com/FrakenboK/asnx/internal/resolver"
 	"github.com/FrakenboK/asnx/internal/runner/validator"
 	extractor "github.com/FrakenboK/asnx/internal/runner/value-extractor"
+	"github.com/FrakenboK/asnx/internal/ui"
 
 	"github.com/spf13/cobra"
 )
@@ -17,6 +18,10 @@ type Runner struct {
 }
 
 func (r *Runner) Start(cmd *cobra.Command, args []string) {
+	if !r.opts.BannerDisabled {
+		r.log.RawLog(ui.GetBanner())
+	}
+
 	if r.opts.Version {
 		cmd.Help()
 		return
@@ -34,7 +39,7 @@ func (r *Runner) Start(cmd *cobra.Command, args []string) {
 }
 
 func New(opts *options.Options) *Runner {
-	logger := logger.New()
+	logger := &logger.Logger{}
 
 	rdap := resolver.NewClient(logger)
 

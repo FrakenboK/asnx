@@ -1,4 +1,4 @@
-package logger
+package ui
 
 import (
 	"fmt"
@@ -12,19 +12,17 @@ import (
 var (
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 	// 57 82 216
-	randomColor = color.RGB(r.Intn(255), r.Intn(255), r.Intn(255))
+	RandomColor = color.RGB(r.Intn(255), r.Intn(255), r.Intn(255))
 
-	failString    = color.RedString("[-]")
-	infoString    = color.GreenString("[+]")
-	versionString = fmt.Sprintf("\t\t  You are using asnx version %s!\n", randomColor.Sprintf(version.Version))
+	FailPrefix  = color.RedString("[-]")
+	InfoPrefix  = color.GreenString("[+]")
+	VersionDesc = fmt.Sprintf("\t\t  You are using asnx version %s!\n", RandomColor.Sprintf(version.Version))
 
-	banner = `								
-												
+	Banner = `
 		▄█████▄  ▄▄█████▄  ██▄████▄  ▀██  ██▀ 
 		▀ ▄▄▄██  ██▄▄▄▄ ▀  ██▀   ██    ████   
 		▄██▀▀▀██   ▀▀▀▀██▄  ██    ██    ▄██▄   
 		██▄▄▄███  █▄▄▄▄▄██  ██    ██   ▄█▀▀█▄  
 		▀▀▀▀ ▀▀   ▀▀▀▀▀▀   ▀▀    ▀▀  ▀▀▀  ▀▀▀ 
-											
-		`
+`
 )

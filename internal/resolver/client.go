@@ -3,6 +3,7 @@ package resolver
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 
 	"github.com/FrakenboK/asnx/internal/logger"
@@ -18,16 +19,20 @@ type Resolver struct {
 type Response struct {
 	IP     string
 	Domain string
-	Name   string
 
 	StartAddress string
 	EndAddress   string
 
-	Author  string
-	Tel     string
-	Country string
-	Email   string
-	Address string
+	Info SpecialInfo
+}
+
+type SpecialInfo struct {
+	Name      string
+	Author    string
+	Telephone string
+	Country   string
+	Email     string
+	Address   string
 }
 
 func (r *Resolver) HandleIPs(ips []string, ipRangeFilename string) {
@@ -42,7 +47,7 @@ func (r *Resolver) HandleIPs(ips []string, ipRangeFilename string) {
 			continue
 		}
 		response := r.processIPResponse(ip, info)
-		r.log.Info(r.fmtResponse(response))
+		r.log.Info(r.printFmtResponse(response))
 
 		responseAsnAddrs, err := getIPRange(response.StartAddress, response.EndAddress)
 		if err != nil {
@@ -59,6 +64,7 @@ func (r *Resolver) HandleIPs(ips []string, ipRangeFilename string) {
 	}
 
 	if ipRangeFilename == "" {
+		r.log.Note("Complete!")
 		return
 	}
 	r.log.Note(fmt.Sprintf("Saving IP ranges to file %s", ipRangeFilename))
@@ -76,59 +82,63 @@ func (r *Resolver) saveIPRange(ipRange []string, filename string) error {
 }
 
 func (r *Resolver) processIPResponse(ip string, info *rdap.IPNetwork) *Response {
-	response := r.processRDAPEntities(info.Entities)
-	response.Name = info.Name
+	parsedInfo := r.processRDAPEntities(info.Entities)
+
+	response := &Response{
+		Info: parsedInfo,
+	}
+
+	response.Info.Name = info.Name
 	response.StartAddress = info.StartAddress
 	response.EndAddress = info.EndAddress
 	response.IP = ip
+
 	return response
 }
 
-func (r *Resolver) processRDAPEntities(entities []rdap.Entity) *Response {
+func (r *Resolver) processRDAPEntities(entities []rdap.Entity) SpecialInfo {
 
 	for _, entity := range entities {
 		if entity.VCard.Tel() == "" && entity.VCard.Email() == "" {
 			continue
 		}
-		return &Response{
-			Author:  entity.VCard.Name(),
-			Email:   entity.VCard.Email(),
-			Tel:     entity.VCard.Tel(),
-			Country: entity.VCard.Country(),
-			Address: entity.VCard.ExtendedAddress(),
+		return SpecialInfo{
+			Author:    entity.VCard.Name(),
+			Email:     entity.VCard.Email(),
+			Telephone: entity.VCard.Tel(),
+			Country:   entity.VCard.Country(),
+			Address:   entity.VCard.ExtendedAddress(),
 		}
 	}
-	return &Response{}
+	return SpecialInfo{}
 }
 
-func (r *Resolver) fmtResponse(resp *Response) string {
+func (r *Resolver) printFmtResponse(resp *Response) string {
 	var printable string
 	if resp.IP != "" {
-		printable = fmt.Sprintf("IP: %24s =>", color.YellowString(resp.IP))
+		fmt.Printf("IP: %24s => ", color.YellowString(resp.IP))
 	} else {
-		printable = fmt.Sprintf("ASN info for Domain name %24s =>", color.YellowString(resp.Domain))
+		fmt.Printf("Domain: %24s => ", color.YellowString(resp.Domain))
 	}
 
-	if resp.Name != "" {
-		printable = fmt.Sprintf("%s Name=\"%s\"", printable, resp.Name)
-	}
-	if resp.Author != "" {
-		printable = fmt.Sprintf("%s Person=\"%s\"", printable, resp.Author)
-	}
-	if resp.Tel != "" {
-		printable = fmt.Sprintf("%s Telephone=\"%s\"", printable, resp.Tel)
-	}
-	if resp.Country != "" {
-		printable = fmt.Sprintf("%s Country=\"%s\"", printable, resp.Country)
-	}
-	if resp.Email != "" {
-		printable = fmt.Sprintf("%s Email=\"%s\"", printable, resp.Email)
-	}
-	if resp.Address != "" {
-		printable = fmt.Sprintf("%s Address=\"%s\"", printable, resp.Address)
-	}
-
+	printable = fmt.Sprintf("%s %s", printable, fmtInfo(resp.Info))
 	printable = fmt.Sprintf("%s IP_range=\"%s - %s\"", printable, resp.StartAddress, resp.EndAddress)
+
+	return printable
+}
+
+func fmtInfo(info SpecialInfo) string {
+	printable := ""
+	reflectionValue := reflect.ValueOf(info)
+
+	for i := 0; i < reflectionValue.NumField(); i++ {
+		field := reflectionValue.Field(i).Interface()
+		if field.(string) == "" {
+			continue
+		}
+		fieldName := reflectionValue.Type().Field(i).Name
+		printable = fmt.Sprintf("%s %s=\"%s\"", printable, fieldName, field)
+	}
 
 	return printable
 }

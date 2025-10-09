@@ -5,21 +5,23 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+
+	"github.com/FrakenboK/asnx/internal/logger/ui"
 )
 
 type Logger struct{}
 
 func (l *Logger) Fail(msg string) {
-	fmt.Println(failString, msg)
+	fmt.Println(ui.FailPrefix, msg)
 }
 
 func (l *Logger) Info(msg string) {
-	fmt.Println(infoString, msg)
+	fmt.Println(ui.InfoPrefix, msg)
 }
 
 func (l *Logger) Banner() {
-	randomColor.Println(banner)
-	fmt.Println(versionString)
+	ui.RandomColor.Println(ui.Banner)
+	fmt.Println(ui.VersionDesc)
 }
 
 func (l *Logger) Note(msg string) {

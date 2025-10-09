@@ -22,7 +22,7 @@ func NewRootCmd() *cobra.Command {
 
 	// Search by IP
 	cmd.Flags().StringArrayVarP(&opts.IPs, "ips", "i", []string{}, "IP addresses (usage: -i 127.0.0.1,8.8.8.8 or --ips ips.txt)")
-	cmd.Flags().StringVarP(&opts.IPRangeFile, "ip-range-file", "r", "ip-range.txt", "File to save all ip ranges handeled from ASN")
+	cmd.Flags().StringVarP(&opts.IPRangeFile, "ip-range-file", "f", "", "File to save all ip ranges handeled from ASN")
 	// TODO: -o
 
 	cmd.Flags().BoolVarP(&opts.Version, "version", "v", false, "Shows asnx version")

@@ -13,10 +13,19 @@
 
 # Installation
 
-### Golang package:
+### Golang package
 ```bash
 go install github.com/FrakenboK/asnx@latest
 ```
+
+### Binary
+```bash
+wget https://github.com/FrakenboK/asnx/releases/download/v1.0.0/asnx-linux-arm64
+chmod +x asnx-linux-arm64
+./asnx-linux-arm64 -h
+```
+
+[All releases](https://github.com/FrakenboK/asnx/releases/tag/v1.0.0)
 
 # Usage
 

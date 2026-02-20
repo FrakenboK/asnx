@@ -13,6 +13,7 @@
 
 # Installation
 
+### Golang package:
 ```bash
 go install github.com/FrakenboK/asnx@latest
 ```
@@ -36,10 +37,9 @@ Usage:
   asnx [flags]
 
 Flags:
-  -d, --domains stringArray    Domain names (usage: -d cr4.sh,yandex.ru or --domains domains.txt)
+  -H, --hosts stringArray      Hosts (usage: -h ya.ru,8.8.8.8 or --hosts hosts.txt)
   -h, --help                   help for asnx
   -f, --ip-range-file string   File to save all ip ranges handeled from ASN
-  -i, --ips stringArray        IP addresses (usage: -i 127.0.0.1,8.8.8.8 or --ips ips.txt)
       --no-banner              Disables banner
   -o, --output string          File to save output
   -v, --version                Shows asnx version

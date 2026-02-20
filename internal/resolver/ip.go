@@ -16,7 +16,7 @@ func getIPRange(start, end string) ([]string, error) {
 	startIP = startIP.To4()
 	endIP = endIP.To4()
 	if startIP == nil || endIP == nil {
-		return nil, fmt.Errorf("IPv6 is not supported:(")
+		return nil, fmt.Errorf("IPv6 is not supported for output ranges:(")
 	}
 
 	// TODO: IPv6?

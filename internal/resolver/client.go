@@ -12,13 +12,14 @@ import (
 )
 
 type Resolver struct {
-	client *rdap.Client
-	log    *logger.Logger
+	client  *rdap.Client
+	log     *logger.Logger
+	Padding int
 }
 
 type Response struct {
-	IP     string
-	Domain string
+	IP string
+	// Domain string
 
 	StartAddress string
 	EndAddress   string
@@ -37,6 +38,8 @@ type SpecialInfo struct {
 
 func (r *Resolver) HandleIPs(ips []string, ipRangeFilename string) {
 	asnIPs := []string{}
+
+	r.Padding = maxStringLength(ips)
 
 	for _, ip := range ips {
 		info, err := r.client.QueryIP(ip)
@@ -58,6 +61,7 @@ func (r *Resolver) HandleIPs(ips []string, ipRangeFilename string) {
 					err.Error(),
 				),
 			)
+			continue
 		}
 
 		asnIPs = append(asnIPs, responseAsnAddrs...)
@@ -115,11 +119,11 @@ func (r *Resolver) processRDAPEntities(entities []rdap.Entity) SpecialInfo {
 
 func (r *Resolver) fmtResponse(resp *Response) string {
 	var printable string
-	if resp.IP != "" {
-		printable = fmt.Sprintf("IP: %24s =>", color.YellowString(resp.IP))
-	} else {
-		printable = fmt.Sprintf("Domain: %24s =>", color.YellowString(resp.Domain))
-	}
+	// if resp.IP != "" {
+	printable = fmt.Sprintf("IP: %s%s =>", strings.Repeat(" ", r.Padding-len(resp.IP)), color.YellowString(resp.IP))
+	// } else {
+	// 	printable = fmt.Sprintf("Domain: %24s =>", color.YellowString(resp.Domain))
+	// }
 
 	printable = fmt.Sprintf("%s %s", printable, fmtSpecialInfo(resp.Info))
 	printable = fmt.Sprintf("%s IP_range=\"%s - %s\"", printable, resp.StartAddress, resp.EndAddress)
@@ -141,6 +145,17 @@ func fmtSpecialInfo(info SpecialInfo) string {
 	}
 
 	return printable
+}
+
+func maxStringLength(arr []string) int {
+	maxLen := 0
+	for _, s := range arr {
+		if len(s) > maxLen {
+			maxLen = len(s)
+		}
+	}
+
+	return maxLen
 }
 
 func NewClient(

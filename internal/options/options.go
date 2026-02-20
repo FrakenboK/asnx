@@ -1,8 +1,7 @@
 package options
 
 type Options struct {
-	IPs     []string
-	Domains []string
+	Hosts []string
 
 	IPRangeFile string
 	OutputFile  string

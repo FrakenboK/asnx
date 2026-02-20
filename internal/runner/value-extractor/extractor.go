@@ -1,8 +1,9 @@
-package Extractor
+package extractor
 
 import (
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"regexp"
 	"strings"
@@ -12,9 +13,9 @@ import (
 )
 
 type Extractor struct {
-	log            *logger.Logger
-	name           string
-	regexValidator *regexp.Regexp
+	log                  *logger.Logger
+	regexIPValidator     *regexp.Regexp
+	regexDomainValidator *regexp.Regexp
 }
 
 func (e *Extractor) ExtractValues(
@@ -48,17 +49,27 @@ func (e *Extractor) ProcessValue(
 		return []string{}
 	}
 
-	// -i 127.0.0.0,8.8.8.8,ips.txt
-	// -d example.com,domains.txt
+	// EXAMPLE: ya.ru,8.8.8.8,ips.txt
 	if strings.Contains(value, ",") {
 		return e.ExtractValues(strings.Split(value, ","))
 	}
 
-	if e.validateValue(value) {
+	if e.isIPAddress(value) {
 		return []string{value}
 	}
 
-	e.log.Fail(fmt.Sprintf("Invalid %s found %s", e.name, color.RedString(value)))
+	if e.isDomainName(value) {
+		resolvedIPs, err := net.LookupIP(value)
+		if err == nil {
+			var ips []string
+			for _, ip := range resolvedIPs {
+				ips = append(ips, ip.String())
+			}
+			return ips
+		}
+	}
+
+	e.log.Fail(fmt.Sprintf("Faied to get ASN info for host %s", color.RedString(value)))
 	return []string{}
 }
 
@@ -73,21 +84,20 @@ func (e *Extractor) extractFileValues(filename string) []string {
 	return e.ExtractValues(values)
 }
 
-func (e *Extractor) validateValue(ip string) bool {
-	if e.regexValidator == nil {
-		return true
-	}
-	return e.regexValidator.MatchString(ip)
+func (e *Extractor) isIPAddress(value string) bool {
+	return e.regexIPValidator.MatchString(value)
+}
+
+func (e *Extractor) isDomainName(value string) bool {
+	return e.regexDomainValidator.MatchString(value)
 }
 
 func New(
 	logger *logger.Logger,
-	name string,
-	regexValidator *regexp.Regexp,
 ) *Extractor {
 	return &Extractor{
-		log:            logger,
-		name:           name,
-		regexValidator: regexValidator,
+		log:                  logger,
+		regexIPValidator:     ipRegex,
+		regexDomainValidator: domainRegex,
 	}
 }

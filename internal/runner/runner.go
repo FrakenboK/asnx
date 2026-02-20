@@ -4,7 +4,6 @@ import (
 	"github.com/FrakenboK/asnx/internal/logger"
 	"github.com/FrakenboK/asnx/internal/options"
 	"github.com/FrakenboK/asnx/internal/resolver"
-	"github.com/FrakenboK/asnx/internal/runner/validator"
 	extractor "github.com/FrakenboK/asnx/internal/runner/value-extractor"
 	"github.com/FrakenboK/asnx/internal/ui"
 
@@ -18,7 +17,7 @@ type Runner struct {
 }
 
 func (r *Runner) Start(cmd *cobra.Command, args []string) {
-	if r.opts.Version || len(r.opts.IPs) == 0 { // TODO: all options
+	if r.opts.Version || len(r.opts.Hosts) == 0 { // TODO: all options
 		cmd.Help()
 		return
 	}
@@ -29,8 +28,8 @@ func (r *Runner) Start(cmd *cobra.Command, args []string) {
 
 	// TODO: all options
 	r.log.Note("Searching for ASNs...")
-	ext := extractor.New(r.log, "IP", validator.IpRegex)
-	ips := ext.ExtractValues(r.opts.IPs)
+	ext := extractor.New(r.log)
+	ips := ext.ExtractValues(r.opts.Hosts)
 	r.rdap.HandleIPs(ips, r.opts.IPRangeFile)
 }
 

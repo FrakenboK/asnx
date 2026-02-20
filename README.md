@@ -41,7 +41,6 @@ Flags:
   -h, --help                   help for asnx
   -f, --ip-range-file string   File to save all ip ranges handeled from ASN
       --no-banner              Disables banner
-  -o, --output string          File to save output
   -v, --version                Shows asnx version
 ```
 
